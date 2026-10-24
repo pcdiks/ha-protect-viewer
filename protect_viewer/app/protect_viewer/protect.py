@@ -52,13 +52,14 @@ class ProtectClient:
         self._verify_ssl = verify_ssl
         self._session: aiohttp.ClientSession | None = None
         self._login_lock = asyncio.Lock()
-        self._logged_in = False
+        # Session cookie and CSRF token from the login, sent with every request
+        # the same way the UniFi web app does.
+        self._token: str | None = None
+        self._csrf: str | None = None
 
     async def start(self) -> None:
-        # unsafe=True: the console is usually addressed by IP, and aiohttp
-        # ignores cookies for IP hosts otherwise.
         self._session = aiohttp.ClientSession(
-            cookie_jar=aiohttp.CookieJar(unsafe=True),
+            cookie_jar=aiohttp.DummyCookieJar(),
             connector=aiohttp.TCPConnector(ssl=None if self._verify_ssl else False),
             timeout=aiohttp.ClientTimeout(total=30),
         )
@@ -84,31 +85,52 @@ class ProtectClient:
                         raise ProtectError("Login refused: check username and password")
                     if resp.status != 200:
                         raise ProtectError(f"Login failed: HTTP {resp.status}")
+                    cookie = resp.cookies.get("TOKEN")
+                    self._token = cookie.value if cookie else None
+                    self._csrf = resp.headers.get("X-Csrf-Token")
             except aiohttp.ClientError as err:
                 raise ProtectError(f"Cannot reach {self.host}: {err}") from err
-            self._logged_in = True
+            if not self._token:
+                raise ProtectError("Login succeeded but the console sent no session cookie")
             _LOGGER.info("Logged in to UniFi console %s", self.host)
+            _LOGGER.debug("CSRF token received: %s", bool(self._csrf))
+
+    def _headers(self) -> dict[str, str]:
+        headers = {"Cookie": f"TOKEN={self._token}"}
+        if self._csrf:
+            headers["X-Csrf-Token"] = self._csrf
+        return headers
 
     async def request(self, path: str, **kwargs) -> aiohttp.ClientResponse:
         """GET a Protect API path; the caller must release the response."""
         assert self._session
-        if not self._logged_in:
+        if not self._token:
             await self._login()
         for attempt in range(2):
             try:
                 resp = await self._session.get(
-                    f"{self._base}/proxy/protect/api{path}", **kwargs
+                    f"{self._base}/proxy/protect/api{path}",
+                    headers=self._headers(),
+                    **kwargs,
                 )
             except aiohttp.ClientError as err:
                 raise ProtectError(f"Cannot reach {self.host}: {err}") from err
+            # The console rotates the CSRF token now and then
+            self._csrf = resp.headers.get("X-Updated-Csrf-Token", self._csrf)
             if resp.status == 401 and attempt == 0:
                 resp.release()
-                self._logged_in = False
+                self._token = None
                 await self._login()
                 continue
             if resp.status >= 400:
+                body = (await resp.text())[:300]
                 resp.release()
-                raise ProtectError(f"GET {path} failed: HTTP {resp.status}")
+                if resp.status in (401, 403):
+                    raise ProtectError(
+                        f"Protect refused access ({resp.status}). Check that the user "
+                        f"has a Protect role. Console said: {body}"
+                    )
+                raise ProtectError(f"GET {path} failed: HTTP {resp.status}: {body}")
             return resp
         raise ProtectError(f"GET {path} failed: not authorized")
 
