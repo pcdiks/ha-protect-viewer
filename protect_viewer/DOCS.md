@@ -1,46 +1,55 @@
 # Protect Viewer
 
-Live view of your UniFi Protect cameras in the Home Assistant sidebar, for every
-Home Assistant user. No UniFi accounts or the native UniFi Protect integration needed.
+Shows your UniFi Protect cameras on a Cameras page in the Home Assistant sidebar. Every
+HA user can open it, so nobody else needs a UniFi account or the Protect app.
 
-Streams come straight from Protect and are only repackaged by the bundled
-[go2rtc](https://github.com/AlexxIT/go2rtc), so CPU use stays low. Each camera opens one
-connection to the console, however many people are watching.
+## Getting started
 
-## Setup
+First make a local user on the UniFi console (Admins & Users) and give it the View Only
+role for Protect. A local user, not a UI.com account. The add-on only needs to look.
 
-1. **Create a local user on the UniFi console.** In UniFi OS, go to Admins & Users and add a
-   local-access-only user with the **View Only** role for Protect.
-2. **Enable RTSP on each camera.** In Protect, open each camera's Settings → Advanced and
-   enable RTSPS for **High** (fullscreen) and **Medium** (grid). With `grid_quality: low`,
-   enable **Low** instead of Medium.
-3. **Configure the add-on** with the console address and the user from step 1, then start it.
-4. **Open "Cameras"** in the sidebar.
+Next, enable RTSPS on each camera. In Protect, go to the camera's settings, open Advanced,
+and switch on High and Medium. High is what you get fullscreen, Medium is used in the grid.
+If you set `grid_quality` to `low`, switch on Low instead of Medium.
+
+Then fill in the console address, username and password in the add-on configuration, start
+it, and click Cameras in the sidebar.
 
 ## Options
 
-| Option | Description |
-| --- | --- |
-| `host` | IP address or hostname of the UniFi console. |
-| `username`, `password` | The local user from step 1. |
-| `verify_ssl` | Verify the console's TLS certificate. Leave off for the default self-signed certificate. |
-| `grid_quality` | Stream used in the grid: `low`, `medium` or `high`. Fullscreen always uses High when it is enabled. |
-| `cameras` | Camera names to show, in this order. Empty shows all cameras, sorted by name. |
-| `webrtc_ip` | IP address browsers use for WebRTC. Empty detects the Home Assistant host address. |
-| `log_level` | `debug` also logs every HTTP request. |
+`host` is the IP address or hostname of the console.
 
-## How video reaches the browser
+`username` and `password` are for the local user you just made.
 
-- **At home:** WebRTC on port 8555 (TCP and UDP) of the Home Assistant host, for the lowest latency.
-- **Away (Nabu Casa, or any remote Ingress access):** port 8555 is not reachable, so the player
-  falls back to MSE over the Ingress websocket. That adds about a second of latency but works
-  without extra configuration.
+`verify_ssl` checks the console's certificate. Leave it off unless you've put a real
+certificate on the console, because the default one is self-signed.
 
-Camera audio is AAC, which only plays over MSE. Over WebRTC the fullscreen view is video only.
+`grid_quality` picks the stream for the grid: `low`, `medium` or `high`. Fullscreen always
+uses High if it's enabled.
 
-## Troubleshooting
+`cameras` is a list of camera names, if you only want some of them or want them in a certain
+order. Leave it empty to get all cameras sorted by name.
 
-- **"RTSP is not enabled for this camera in Protect"**: enable RTSPS for the camera (setup step 2).
-  The add-on checks Protect again every 10 minutes, or restart it to pick up the change right away.
-- **"Login refused"**: check the username and password, and that the user is a local user, not a
-  UI.com account.
+`webrtc_ip` is the address browsers connect to for WebRTC. Normally you leave it empty and
+the add-on looks up the address of the HA host by itself.
+
+`log_level` can go to `debug` when something's wrong. It also logs every request then, so
+don't leave it on.
+
+## At home and away
+
+At home the video comes in over WebRTC on port 8555 of the HA host, which is about as fast
+as it gets. When you're away (through Nabu Casa, for example) that port isn't reachable, and
+the player switches to streaming through Home Assistant itself. That's maybe a second
+slower but you don't have to set anything up for it.
+
+One catch: the cameras send AAC audio, and WebRTC can't play that. So at home the fullscreen
+view has no sound. Away from home it does.
+
+## If something's off
+
+A tile that says RTSP isn't enabled means you missed that camera in the RTSPS step. The
+add-on checks Protect every 10 minutes, or restart it if you don't want to wait.
+
+"Login refused" is nearly always the wrong password, or a UI.com account instead of a
+local user.

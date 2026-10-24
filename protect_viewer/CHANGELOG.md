@@ -2,5 +2,5 @@
 
 ## 0.1.0
 
-- Live camera grid and fullscreen view for UniFi Protect cameras over Ingress.
-- go2rtc configured automatically from the cameras in Protect.
+First version. Live view only for now: a grid with all cameras and a fullscreen view per
+camera. The go2rtc config is generated from whatever cameras Protect has.
