@@ -1,0 +1,26 @@
+configuration:
+  host:
+    name: UniFi console
+    description: IP address or hostname of the UniFi console running Protect.
+  username:
+    name: Username
+    description: Local UniFi OS user with access to Protect (a View Only role is enough for live view).
+  password:
+    name: Password
+  verify_ssl:
+    name: Verify TLS certificate
+    description: Leave off when the console uses its default self-signed certificate.
+  grid_quality:
+    name: Grid quality
+    description: Protect stream used for the camera grid. Fullscreen always uses the highest enabled stream.
+  cameras:
+    name: Cameras
+    description: Names of the cameras to show, in this order. Leave empty to show all cameras.
+  webrtc_ip:
+    name: WebRTC address
+    description: IP address of Home Assistant that browsers use for WebRTC. Leave empty to detect it automatically.
+  log_level:
+    name: Log level
+network:
+  8555/tcp: WebRTC (TCP)
+  8555/udp: WebRTC (UDP)
