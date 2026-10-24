@@ -32,3 +32,7 @@ PV_OPTIONS=options.json PV_GO2RTC=/path/to/go2rtc PV_GO2RTC_CONFIG=/tmp/go2rtc.y
 ```
 
 `options.json` takes the same keys as the add-on options.
+
+Versions are the release date with a counter behind it, like `2026.10.24-1`. A second
+release on the same day becomes `-2`. Bump it in `protect_viewer/config.yaml` with every
+push, otherwise Home Assistant won't offer the update.

@@ -1,5 +1,5 @@
 name: Protect Viewer
-version: "0.1.0"
+version: "2026.10.24-1"
 slug: protect_viewer
 description: Live view of UniFi Protect cameras in the Home Assistant sidebar
 url: https://github.com/pcdiks/ha-protect-viewer
