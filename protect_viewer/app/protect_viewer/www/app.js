@@ -139,6 +139,7 @@ async function refresh(initial) {
   try {
     const data = await load();
     showBanner(data.error);
+    document.body.classList.toggle('hide-stream-type', !data.show_stream_type);
     const changed = signature(data.cameras) !== signature(cameras);
     cameras = data.cameras;
     if (initial || changed) route();

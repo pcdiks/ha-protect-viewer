@@ -26,6 +26,7 @@ GO2RTC_FILES = {"video-stream.js", "video-rtc.js"}
 @dataclass
 class State:
     grid_quality: str
+    show_stream_type: bool = False
     cameras: list[Camera] = field(default_factory=list)
     error: str | None = None
     snapshots: dict[str, tuple[float, bytes]] = field(default_factory=dict)
@@ -62,7 +63,13 @@ async def cameras(request: web.Request) -> web.Response:
                 "streams": streams or None,
             }
         )
-    return web.json_response({"error": state.error, "cameras": result})
+    return web.json_response(
+        {
+            "error": state.error,
+            "show_stream_type": state.show_stream_type,
+            "cameras": result,
+        }
+    )
 
 
 async def snapshot(request: web.Request) -> web.Response:

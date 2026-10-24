@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.24-4
+
+The RTC/MSE label in the corner of each camera is hidden now. Turn on `show_stream_type`
+if you want it back. Errors still show up either way.
+
 ## 2026.10.24-3
 
 Found the real cause of the 401s. UniFi OS marks its login cookie as Partitioned, and the

@@ -30,6 +30,10 @@ uses High if it's enabled.
 `cameras` is a list of camera names, if you only want some of them or want them in a certain
 order. Leave it empty to get all cameras sorted by name.
 
+`show_stream_type` puts a small RTC or MSE label in the corner of each camera, so you can
+see how it's connected. Off by default, it's mostly useful when you're figuring out why
+something is slow.
+
 `webrtc_ip` is the address browsers connect to for WebRTC. Normally you leave it empty and
 the add-on looks up the address of the HA host by itself.
 

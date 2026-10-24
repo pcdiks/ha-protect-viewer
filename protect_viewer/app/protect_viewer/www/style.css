@@ -100,6 +100,9 @@ video-stream video {
 }
 .tile video-stream video { pointer-events: none; }
 
+/* go2rtc's player shows the connection type top right; errors stay visible top left */
+.hide-stream-type video-stream .mode { display: none; }
+
 .label {
   position: absolute;
   left: 0;

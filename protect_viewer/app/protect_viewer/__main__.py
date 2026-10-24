@@ -98,7 +98,10 @@ async def main() -> None:
         options["host"], options["username"], options["password"], options["verify_ssl"]
     )
     await protect.start()
-    state = State(grid_quality=options["grid_quality"])
+    state = State(
+        grid_quality=options["grid_quality"],
+        show_stream_type=options.get("show_stream_type", False),
+    )
     runner = go2rtc.Go2rtc(GO2RTC_BINARY, GO2RTC_CONFIG)
 
     access_log = logging.getLogger("aiohttp.access") if options.get("log_level") == "debug" else None

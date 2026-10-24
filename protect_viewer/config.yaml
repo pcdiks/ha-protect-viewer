@@ -1,5 +1,5 @@
 name: Protect Viewer
-version: "2026.10.24-3"
+version: "2026.10.24-4"
 slug: protect_viewer
 description: Live view of UniFi Protect cameras in the Home Assistant sidebar
 url: https://github.com/pcdiks/ha-protect-viewer
@@ -25,6 +25,7 @@ options:
   verify_ssl: false
   grid_quality: medium
   cameras: []
+  show_stream_type: false
   webrtc_ip: ""
   log_level: info
 schema:
@@ -35,5 +36,6 @@ schema:
   grid_quality: list(low|medium|high)
   cameras:
     - str
+  show_stream_type: bool?
   webrtc_ip: str?
   log_level: list(debug|info|warning|error)

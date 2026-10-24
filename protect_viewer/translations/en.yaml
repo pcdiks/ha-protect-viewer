@@ -16,6 +16,9 @@ configuration:
   cameras:
     name: Cameras
     description: Names of the cameras to show, in this order. Leave empty to show all cameras.
+  show_stream_type:
+    name: Show stream type
+    description: Show how each camera is connected (RTC or MSE) in the corner of its video.
   webrtc_ip:
     name: WebRTC address
     description: IP address of Home Assistant that browsers use for WebRTC. Leave empty to detect it automatically.
