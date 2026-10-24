@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.24-5
+
+New Detections tab. It shows the people, vehicles, animals and packages Protect detected,
+grouped by day, with a filter per camera and per type. Tap one to play the clip. There's a
+new `clip_quality` option in case the full 4K clips are too heavy away from home.
+
 ## 2026.10.24-4
 
 The RTC/MSE label in the corner of each camera is hidden now. Turn on `show_stream_type`

@@ -142,3 +142,109 @@ video-stream video {
 }
 
 .empty { color: var(--muted); padding: 24px 0; }
+
+/* Tabs */
+
+nav { margin-left: auto; display: flex; gap: 4px; }
+nav a {
+  padding: 6px 12px;
+  border-radius: 16px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+nav a.active {
+  color: var(--text);
+  background: color-mix(in srgb, var(--muted) 20%, transparent);
+}
+
+/* Detections */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.filters select, .chip {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+  border-radius: 17px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.day {
+  margin: 20px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.events {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+}
+
+.event {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+}
+.event:hover .thumb img { opacity: 0.85; }
+
+.thumb { position: relative; aspect-ratio: 16 / 9; background: var(--tile); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb span {
+  position: absolute;
+  bottom: 6px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 13px;
+}
+.thumb .time { left: 6px; }
+.thumb .duration { right: 6px; }
+
+.event .meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 0;
+}
+.event .camera { font-weight: 500; }
+.event .types { color: var(--muted); text-align: right; }
+.event .details {
+  padding: 2px 10px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.event > :last-child { padding-bottom: 9px; }
+
+.list-footer { padding: 20px 0; text-align: center; color: var(--muted); }
+
+.clip {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 170px);
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--tile);
+}
+.clip video { width: 100%; height: 100%; display: block; }
+.clip .notice { pointer-events: none; }
+
+.clip-info { padding: 12px 2px; }
+.clip-title { font-size: 17px; font-weight: 600; }
+.clip-sub { color: var(--muted); }

@@ -4,9 +4,10 @@ I wanted my UniFi Protect cameras in Home Assistant the way Frigate shows up the
 page in the sidebar with all the cameras on it, that the whole family can open. The
 native UniFi Protect integration never really did that for me, so I made this add-on.
 
-It logs in to the console, picks up the cameras and their RTSPS streams, and plays them
-through a bundled [go2rtc](https://github.com/AlexxIT/go2rtc). Nothing gets transcoded, so it's
-light on the HA host.
+It shows the cameras live, and lists what Protect detected so you can watch the clips. It
+logs in to the console, picks up the cameras and their RTSPS streams, and plays them
+through a bundled [go2rtc](https://github.com/AlexxIT/go2rtc). Nothing gets transcoded, so
+it's light on the HA host.
 
 ## Installing
 

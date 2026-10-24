@@ -1,7 +1,8 @@
 # Protect Viewer
 
-Shows your UniFi Protect cameras on a Cameras page in the Home Assistant sidebar. Every
-HA user can open it, so nobody else needs a UniFi account or the Protect app.
+Shows your UniFi Protect cameras on a Cameras page in the Home Assistant sidebar, live and
+with the detections Protect recorded. Every HA user can open it, so nobody else needs a
+UniFi account or the Protect app.
 
 ## Getting started
 
@@ -27,6 +28,10 @@ certificate on the console, because the default one is self-signed.
 `grid_quality` picks the stream for the grid: `low`, `medium` or `high`. Fullscreen always
 uses High if it's enabled.
 
+`clip_quality` is for the detection clips. `high` gives you the full recording, which on
+4K cameras is about a megabyte per second of video. `low` is 640x360, a lot smaller and
+quicker when you're on mobile data.
+
 `cameras` is a list of camera names, if you only want some of them or want them in a certain
 order. Leave it empty to get all cameras sorted by name.
 
@@ -49,6 +54,20 @@ slower but you don't have to set anything up for it.
 
 One catch: the cameras send AAC audio, and WebRTC can't play that. So at home the fullscreen
 view has no sound. Away from home it does.
+
+## Detections
+
+The Detections tab lists what Protect picked up with its smart detections: people,
+vehicles, animals and packages, newest first, grouped by day. You can narrow it down to one
+camera or one kind of detection, and it keeps loading older ones as you scroll. Tap one to
+watch the clip, with a couple of seconds extra before and after.
+
+Nothing is stored by the add-on itself. The list and thumbnails come straight from Protect,
+so you see whatever your Protect retention still has. Clips are cut from the recording when
+you open them and the last 500 MB or so is kept around, so opening one again is instant.
+
+The cameras record in H.265. Safari plays that, and so does Chrome on almost any recent
+hardware. Firefox doesn't, you'll get a message instead of a video there.
 
 ## If something's off
 

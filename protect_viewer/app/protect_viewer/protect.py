@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import aiohttp
 
@@ -166,3 +167,54 @@ class ProtectClient:
         )
         async with resp:
             return await resp.read()
+
+    async def events(
+        self,
+        camera_ids: list[str],
+        before: int,
+        limit: int,
+        detect_type: str | None = None,
+    ) -> list[dict]:
+        """Smart detections on the given cameras, newest first, starting before `before` (ms)."""
+        params = [
+            ("end", str(before)),
+            ("limit", str(limit)),
+            ("orderDirection", "DESC"),
+            ("types", "smartDetectZone"),
+            ("types", "smartDetectLine"),
+        ]
+        params += [("cameras", camera_id) for camera_id in camera_ids]
+        if detect_type:
+            params.append(("smartDetectTypes", detect_type))
+        resp = await self.request("/events", params=params)
+        async with resp:
+            return await resp.json()
+
+    async def event(self, event_id: str) -> dict:
+        resp = await self.request(f"/events/{event_id}")
+        async with resp:
+            return await resp.json()
+
+    async def event_thumbnail(self, event_id: str) -> bytes:
+        resp = await self.request(f"/events/{event_id}/thumbnail")
+        async with resp:
+            return await resp.read()
+
+    async def export(
+        self, camera_id: str, start: int, end: int, channel: int, target: Path
+    ) -> None:
+        """Download a recording as MP4 into `target`."""
+        resp = await self.request(
+            "/video/export",
+            params={
+                "camera": camera_id,
+                "start": str(start),
+                "end": str(end),
+                "channel": str(channel),
+            },
+            timeout=aiohttp.ClientTimeout(total=300),
+        )
+        async with resp:
+            with target.open("wb") as file:
+                async for chunk in resp.content.iter_chunked(256 * 1024):
+                    file.write(chunk)

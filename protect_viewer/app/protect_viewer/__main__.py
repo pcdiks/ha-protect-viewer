@@ -13,6 +13,7 @@ import aiohttp
 from aiohttp import web
 
 from . import go2rtc
+from .clips import ClipCache
 from .protect import Camera, ProtectClient, ProtectError
 from .server import State, create_app
 
@@ -21,6 +22,8 @@ _LOGGER = logging.getLogger("protect_viewer")
 OPTIONS_PATH = Path(os.environ.get("PV_OPTIONS", "/data/options.json"))
 GO2RTC_BINARY = os.environ.get("PV_GO2RTC", "/usr/local/bin/go2rtc")
 GO2RTC_CONFIG = Path(os.environ.get("PV_GO2RTC_CONFIG", "/tmp/go2rtc.yaml"))
+CLIP_DIR = Path(os.environ.get("PV_CLIP_DIR", "/tmp/clips"))
+CLIP_CACHE_BYTES = 512 * 1024 * 1024
 PORT = int(os.environ.get("PV_PORT", "8099"))
 REFRESH_INTERVAL = 600  # seconds between camera list refreshes
 RETRY_INTERVAL = 30  # seconds before retrying after an error
@@ -103,9 +106,12 @@ async def main() -> None:
         show_stream_type=options.get("show_stream_type", False),
     )
     runner = go2rtc.Go2rtc(GO2RTC_BINARY, GO2RTC_CONFIG)
+    clips = ClipCache(
+        protect, CLIP_DIR, CLIP_CACHE_BYTES, options.get("clip_quality", "high")
+    )
 
     access_log = logging.getLogger("aiohttp.access") if options.get("log_level") == "debug" else None
-    web_runner = web.AppRunner(create_app(state, protect), access_log=access_log)
+    web_runner = web.AppRunner(create_app(state, protect, clips), access_log=access_log)
     await web_runner.setup()
     await web.TCPSite(web_runner, "0.0.0.0", PORT).start()
     _LOGGER.info("Listening on port %d", PORT)

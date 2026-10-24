@@ -13,6 +13,9 @@ configuration:
   grid_quality:
     name: Grid quality
     description: Protect stream used for the camera grid. Fullscreen always uses the highest enabled stream.
+  clip_quality:
+    name: Clip quality
+    description: Quality of detection clips. High is the full recording, low is 640x360 and loads much faster away from home.
   cameras:
     name: Cameras
     description: Names of the cameras to show, in this order. Leave empty to show all cameras.
