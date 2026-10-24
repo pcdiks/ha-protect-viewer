@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.24-3
+
+Found the real cause of the 401s. UniFi OS marks its login cookie as Partitioned, and the
+Python version in the add-on quietly throws such cookies away, so the add-on never had a
+session. It now reads the cookie straight from the response.
+
 ## 2026.10.24-2
 
 The login worked but Protect then turned every request down with a 401. The add-on now

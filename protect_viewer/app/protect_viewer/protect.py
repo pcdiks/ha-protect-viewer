@@ -43,6 +43,19 @@ class Camera:
         )
 
 
+def _token_cookie(set_cookies: list[str]) -> str | None:
+    """Pick the TOKEN value out of raw Set-Cookie headers.
+
+    Parsed by hand because UniFi OS marks the cookie Partitioned, and Python's
+    cookie parser before 3.14 silently drops cookies with that attribute.
+    """
+    for header in set_cookies:
+        name, _, rest = header.partition("=")
+        if name.strip() == "TOKEN":
+            return rest.split(";", 1)[0].strip() or None
+    return None
+
+
 class ProtectClient:
     def __init__(self, host: str, username: str, password: str, verify_ssl: bool) -> None:
         self.host = host
@@ -85,13 +98,16 @@ class ProtectClient:
                         raise ProtectError("Login refused: check username and password")
                     if resp.status != 200:
                         raise ProtectError(f"Login failed: HTTP {resp.status}")
-                    cookie = resp.cookies.get("TOKEN")
-                    self._token = cookie.value if cookie else None
+                    set_cookies = resp.headers.getall("Set-Cookie", [])
+                    self._token = _token_cookie(set_cookies)
                     self._csrf = resp.headers.get("X-Csrf-Token")
             except aiohttp.ClientError as err:
                 raise ProtectError(f"Cannot reach {self.host}: {err}") from err
             if not self._token:
-                raise ProtectError("Login succeeded but the console sent no session cookie")
+                names = [header.partition("=")[0] for header in set_cookies]
+                raise ProtectError(
+                    f"Login succeeded but the console sent no TOKEN cookie (got: {names})"
+                )
             _LOGGER.info("Logged in to UniFi console %s", self.host)
             _LOGGER.debug("CSRF token received: %s", bool(self._csrf))
 
